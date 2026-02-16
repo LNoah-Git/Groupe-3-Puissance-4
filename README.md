@@ -1,1 +1,1 @@
-# Groupe-3-Puissance-4
+# Groupe-3: Puissance-4
