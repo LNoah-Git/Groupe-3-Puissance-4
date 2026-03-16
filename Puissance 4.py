@@ -3,7 +3,7 @@ import math
 #1/
 
 LIGNES = 6
-COLOGNES = 7
+COLONNES = 7
 
 #Inverse la matrice et l'aligne.
 def afficher(grille):
@@ -12,7 +12,7 @@ def afficher(grille):
 
 #Création d'une Grille 6 par 7
 def nv_grille():
-  return [[0 for _ in range(COLOGNES)] for _ in range(LIGNES)]
+  return [[0 for _ in range(COLONNES)] for _ in range(LIGNES)]
 
 #Place le jeton du joueur dans la ligne
 def placer(grille, cl, lg, jeton):
