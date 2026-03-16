@@ -61,5 +61,11 @@ while not Jeu_Terminer:
     #Test
     afficher(grille)
 
+    #Ce qui reste à faire:fonction qui vérifie si 4 même chiffres sont alignés+indiqué une limite de jeton sur une colonne pleine au joueur
+      #indiquer au joueur si il rentre un indice nompris dans la matrice 
+      #améliorer l'esthétique du jeu
+      
+      
+
     Tour += 1
     Tour %= 2
