@@ -125,3 +125,4 @@ print("! PARTIE TERMINER !")
 
 #!! CE QU'IL RESTE A FAIRE!!
 #Essayer de crée une interface pour le jeu
+#Ps: je les fais mais je les pas mis dans GitHub, essayer de le faire par vous même
