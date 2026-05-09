@@ -1,5 +1,7 @@
+import json
 import math, time
 import tkinter as tk
+from random import randint
 
 #1/
 #Création d'une Grille 6 par 7
@@ -37,13 +39,13 @@ def lg_gagnant(grille, jeton):
       
   #vérifie les verticales
   for c in range(COLONNES):
-    for l in range(LIGNES - 2):
+    for l in range(LIGNES - 3):
       if grille[l][c] == jeton and grille[l + 1][c] == jeton and grille[l + 2][c] == jeton and grille[l + 3][c] == jeton:
         return True
       
   #vérifie les diagonales qui monte vert la droite
   for c in range(COLONNES - 3):
-    for l in range(LIGNES - 2):
+    for l in range(LIGNES - 3):
       if grille[l][c] == jeton and grille[l + 1][c + 1] == jeton and grille[l + 2][c + 2] == jeton and grille[l + 3][c + 3] == jeton:
         return True
 
@@ -52,6 +54,13 @@ def lg_gagnant(grille, jeton):
     for l in range(2, LIGNES):
       if grille[l][c] == jeton and grille[l - 1][c + 1] == jeton and grille[l - 2][c + 2] == jeton and grille[l - 3][c + 3] == jeton:
         return True
+
+def grille_pleine(grille):
+  for l in range(LIGNES):
+    for c in range(COLONNES):
+      if grille[l][c] == 0:
+        return False
+  return True
 
 def ErreurVal(cl):
 
@@ -72,16 +81,87 @@ class Puissance4:
   def __init__(self, fenetre):
     self.fenetre = fenetre
     self.fenetre.title("Puissance4")
+    self.historique = []
 
-    self.grille = nv_grille()
-    self.joueur = 1
-
+#---Scores---
+    self.scorej1 = 0
+    self.scorej2 = 0
+    self.label_score = tk.Label(fenetre, text="J1: 0   J2: 0", font=("Arial", 16), bg="dark blue", fg="white")
+    self.label_score.pack(pady=10)
+    
+#---Bouttons---
     self.canvas = tk.Canvas(fenetre, width=COLONNES*TAILLE, height=LIGNES*TAILLE, bg="dark blue")
     self.canvas.pack()
+    self.canvas.create_text((COLONNES * TAILLE)//2, (LIGNES * TAILLE)//2, font=("Arial", 40), text="Puissance 4 =)", fill="White")
+
+    self.bouton_annuler = tk.Button(fenetre, text="<Annuler<", command=self.retour, bg="orange")
+    self.bouton_annuler.pack_forget()
+
+    self.bouton_nouvelleParti = tk.Button(fenetre, text="Nouvelle Partie", command=self.commencer, bg="green")
+    self.bouton_nouvelleParti.pack(side=tk.LEFT, padx=10)
+    
+    self.bouton_sauvegarder = tk.Button(fenetre, text="Sauvegarder", command=self.sauvegarder_partie, bg="light blue")
+    self.bouton_sauvegarder.pack_forget()
+    
+    self.bouton_charger = tk.Button(fenetre, text="Charger", command=self.charger_partie, bg="yellow")
+    self.bouton_charger.pack(side=tk.LEFT, padx=10)
+
+  def commencer(self):
+    self.canvas.bind("<Button-1>", self.clic)
+    self.bouton_sauvegarder.pack(side=tk.LEFT, padx=10)
+    self.bouton_annuler.pack(side=tk.LEFT, padx=10)
+    self.bouton_nouvelleParti.pack_forget()
+
+    self.grille = nv_grille()
+    self.joueur = randint(1, 2)
+    self.Emplacements()
+    self.bouton_annuler.config(state="normal")
+
+  def sauvegarde_etat(self):
+    copie = [row[:] for row in self.grille]
+    self.historique.append(copie)
+
+  def sauvegarder_partie(self):
+    data = {"grille": self.grille, "joueur": self.joueur, "historique": self.historique, "scorej1": self.scorej1, "scorej2": self.scorej2}
+    with open('sauvegarde_p4.json', 'w') as f:
+      json.dump(data, f)
+
+    print("partie sauvegardée.")
+
+  def charger_partie(self):
+    try:
+      with open('sauvegarde_p4.json', 'r') as f:
+        data = json.load(f)
+    except FileNotFoundError:
+      print("Aucune sauvegarde trouvée.")
+      return
+    
+    self.grille = data["grille"]
+    self.joueur = data["joueur"]
+    self.historique = data["historique"]
+    self.scorej1 = data["scorej1"]
+    self.scorej2 = data["scorej2"]
+    self.maj_score()
 
     self.canvas.bind("<Button-1>", self.clic)
-    self.Emplacements()
+    self.bouton_annuler.pack(side=tk.LEFT, padx=10)
+    self.bouton_annuler.config(state="normal")
 
+    self.Emplacements()
+    self.fenetre.title(f"Puissance4 - Tour - Joueur{self.joueur}")
+    print("Partie chargée.")
+
+  def maj_score(self):
+    self.label_score.config(text=f"J1: {self.scorej1} J2: {self.scorej2}")
+
+  def retour(self):
+    if not self.historique:
+      return
+    self.grille = self.historique.pop()
+    self.joueur = 2 if self.joueur == 1 else 1
+    self.Emplacements()
+    self.fenetre.title(f"Puissance4 - Tour - Joueur{self.joueur}")
+  
   def Emplacements(self):
     self.canvas.delete("all")
 
@@ -107,80 +187,34 @@ class Puissance4:
     if ligne is None:
         return #colonne pleine
     
+    self.sauvegarde_etat()
     self.grille[ligne][col] = self.joueur
     self.Emplacements()
 
     if lg_gagnant(self.grille, self.joueur):
+      if self.joueur == 1:
+        self.scorej1 += 1
+      else:
+        self.scorej2 += 1
+
+      self.maj_score()
       self.canvas.unbind("<Button-1>")
+      self.bouton_annuler.config(state="disabled")
       self.canvas.create_text((COLONNES * TAILLE)//2, (LIGNES * TAILLE)//2, text=f"Joueur{self.joueur} à Gagné !", fill="red" if self.joueur == 1 else "yellow" , font=("Arial", 32, "bold"))
       self.fenetre.title("Puissance4 - Partie Terminer")
+      self.bouton_nouvelleParti.pack(side=tk.LEFT, padx=10)
       return
     
+    if grille_pleine(self.grille):
+      self.canvas.unbind("<Button-1>")
+      self.bouton_annuler.config(state="disabled")
+      self.canvas.create_text((COLONNES * TAILLE)//2, (LIGNES * TAILLE)//2, text="Partie Nulle !", fill="White" , font=("Arial", 32, "bold"))
+      self.fenetre.title("Puissance4 - Partie Nulle")
+      self.bouton_nouvelleParti.pack(side=tk.LEFT, padx=10)
+
     self.joueur = 2 if self.joueur == 1 else 1
     self.fenetre.title(f"Puissance4 - Tour - Joueur{self.joueur}")
 
 fenetre = tk.Tk()
 Puissance4(fenetre)
 fenetre.mainloop()
-
-"""""
-#Test
-afficher(grille)
-
-while not Jeu_Terminer:
-  if Tour == 0:
-
-
-    #Tour du Joueur 1
-
-    #Vérifie que ErreurVal() est correct
-    try:
-      cl = "Input"
-      cl = int(input("Tour du Joueur 1, colonne(1 à 7): ")) - 1
-    except ValueError:
-        cl = ErreurVal(cl)
-  
-
-    if position_vd(grille, cl):
-      lg = prochaine_ligne(grille, cl)
-      placer(grille, cl, lg, 1)
-
-      #Test
-      afficher(grille)
-
-      if lg_gagnant(grille, 1) == True:
-        print("LE JOUEUR 1 à gagné !")
-        Jeu_Terminer = True
-
-      Tour += 1
-
-  #Tour du Joueur 2
-  
-  else:
-
-     #Vérifie que ErreurVal() est correct
-    try:
-      cl = "Input"
-      cl = int(input("Tour du Joueur 1, colonne(1 à 7): ")) - 1
-    except ValueError:
-        cl = ErreurVal(cl)
-
-    if position_vd(grille, cl):
-      lg = prochaine_ligne(grille, cl)
-      placer(grille, cl, lg, 2)
-    
-    #Test
-    afficher(grille)
-
-    if lg_gagnant(grille, 2) == True:
-        print("LE JOUEUR 2 à gagné !")
-        Jeu_Terminer = True
-
-
-    Tour += 1
-    Tour %= 2
-time.sleep(1.5)
-print("! PARTIE TERMINER !")"""
-
-#!! CE QU'IL RESTE A FAIRE!!
-#Quelque correction
