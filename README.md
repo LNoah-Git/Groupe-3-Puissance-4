@@ -1,1 +1,6 @@
-# Groupe-3: Puissance-4
+# Groupe-3 Biologie Informatique/TD-02: Puissance-4
+
+Leblond Noah
+Aggad Rafik
+Adam Krouna
+Samy Achour
