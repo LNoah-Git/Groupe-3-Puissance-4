@@ -79,21 +79,24 @@ Tour = 0
 
 class Puissance4:
   def __init__(self, fenetre):
+
     self.fenetre = fenetre
     self.fenetre.title("Puissance4")
     self.historique = []
-
+  
 #---Scores---
     self.scorej1 = 0
     self.scorej2 = 0
     self.label_score = tk.Label(fenetre, text="J1: 0   J2: 0", font=("Arial", 16), bg="dark blue", fg="white")
     self.label_score.pack(pady=10)
-    
-#---Bouttons---
+
+#---Interface---
     self.canvas = tk.Canvas(fenetre, width=COLONNES*TAILLE, height=LIGNES*TAILLE, bg="dark blue")
     self.canvas.pack()
     self.canvas.create_text((COLONNES * TAILLE)//2, (LIGNES * TAILLE)//2, font=("Arial", 40), text="Puissance 4 =)", fill="White")
+    
 
+#---Bouttons---
     self.bouton_annuler = tk.Button(fenetre, text="<Annuler<", command=self.retour, bg="orange")
     self.bouton_annuler.pack_forget()
 
