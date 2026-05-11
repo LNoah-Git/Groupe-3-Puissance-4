@@ -208,8 +208,8 @@ class Puissance4:
     if grille_pleine(self.grille):
       self.canvas.unbind("<Button-1>")
       self.bouton_annuler.config(state="disabled")
-      self.canvas.create_text((COLONNES * TAILLE)//2, (LIGNES * TAILLE)//2, text="Partie Nulle !", fill="White" , font=("Arial", 32, "bold"))
-      self.fenetre.title("Puissance4 - Partie Nulle")
+      self.canvas.create_text((COLONNES * TAILLE)//2, (LIGNES * TAILLE)//2, text="Partie Nul !", fill="White" , font=("Arial", 32, "bold"))
+      self.fenetre.title("Puissance4 - Partie Nul")
       self.bouton_nouvelleParti.pack(side=tk.LEFT, padx=10)
 
     self.joueur = 2 if self.joueur == 1 else 1
